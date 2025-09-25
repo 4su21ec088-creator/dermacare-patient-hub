@@ -59,9 +59,10 @@ export const PatientIdentitySection = ({ data, onChange }: PatientIdentitySectio
           <Label htmlFor="fileNo">File Number</Label>
           <Input
             id="fileNo"
-            value={data.fileNo}
+            value={data.fileNo || `FN${Date.now()}`}
             onChange={(e) => onChange("fileNo", e.target.value)}
             placeholder="Auto-generated"
+            readOnly
           />
         </div>
         <div>
@@ -69,8 +70,9 @@ export const PatientIdentitySection = ({ data, onChange }: PatientIdentitySectio
           <Input
             id="date"
             type="date"
-            value={data.date}
+            value={data.date || new Date().toISOString().split('T')[0]}
             onChange={(e) => onChange("date", e.target.value)}
+            readOnly
           />
         </div>
       </CardContent>

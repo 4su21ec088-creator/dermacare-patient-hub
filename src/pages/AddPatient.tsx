@@ -1,20 +1,26 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { PatientIdentitySection } from "@/components/forms/PatientIdentitySection";
+import { HistorySection } from "@/components/forms/HistorySection";
+import { FamilyHistorySection } from "@/components/forms/FamilyHistorySection";
+import { SocialHistorySection } from "@/components/forms/SocialHistorySection";
+import { IllnessSyndromeSection } from "@/components/forms/IllnessSyndromeSection";
 import { DermatologicExaminationSection } from "@/components/forms/DermatologicExaminationSection";
 import { DiagnosisSection } from "@/components/forms/DiagnosisSection";
 import { TreatmentSection } from "@/components/forms/TreatmentSection";
 
 const AddPatient = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const [patientData, setPatientData] = useState({
     // Patient Identity
     name: "",
@@ -22,122 +28,26 @@ const AddPatient = () => {
     sex: "",
     phone: "",
     fileNo: "",
-    date: new Date().toISOString().split('T')[0],
+    date: "",
     
     // Complaints & Duration
     complaints: "",
     duration: "",
     
     // History
-    historyDetails: "",
-    isItchy: false,
-    whereStarted: "",
-    howSpread: "",
-    evolutionLesions: "",
-    anatomicalSpread: "",
-    
-    // Treatments taken
-    treatments: {
-      gp: false,
-      derm: false,
-      ayurveda: false,
-      unani: false,
-      homeo: false,
-      sidha: false,
-      herbal: false,
-      naturopathy: false,
-      beautician: false,
-      self: false,
-      others: false,
-      othersDetails: ""
-    },
-    
-    // Investigations
-    investigations: {
-      dna: false,
-      nad: false,
-      na: false,
-      nr: false,
-      no: false,
-      sbpr: false,
-      sats: false,
-      investigationDetails: ""
-    },
-    
-    // Medical History
-    provocativeFactors: "",
-    relievingFactors: "",
-    medicalIllnesses: "",
-    surgicalIllnesses: "",
-    vaccines: false,
-    vaccineDetails: "",
-    
-    // Allergies
-    allergies: {
-      drug: false,
-      drugDetails: "",
-      food: false,
-      foodDetails: "",
-      others: false,
-      othersDetails: ""
-    },
-    
-    // Atopy
-    atopy: {
-      wheezing: false,
-      sneezing: false
-    },
-    
-    // Medications
-    currentMedication: "",
-    concomitantMedication: false,
-    concomitantDetails: "",
-    longTermMedication: {
-      hp: false,
-      dm: false,
-      pt: false,
-      ep: false,
-      details: ""
-    },
+    history: {},
     
     // Family History
-    familyHistory: {
-      skinDisease: false,
-      skinDiseaseDetails: "",
-      similarDisease: false,
-      similarDiseaseDetails: "",
-      diabetes: false
-    },
+    familyHistory: {},
     
     // Social History
-    socialHistory: {
-      occupation: "",
-      hobbies: "",
-      exposure: "",
-      riskSTD: false,
-      riskSTDDetails: "",
-      travel: "",
-      address: ""
-    },
+    socialHistory: {},
     
-    // Women-specific
-    womenHistory: {
-      maritalStatus: "",
-      pregnant: false,
-      pregnantDetails: "",
-      breastfeeding: false,
-      breastfeedingDetails: "",
-      children: "",
-      childrenMale: "",
-      childrenFemale: "",
-      menstruating: false
-    },
-    
-    // GPE
+    // General Physical Examination
     gpe: {
       temperature: "",
       respiration: "",
-      bodySurfaceArea: "",
+      bodyArea: "",
       pulse: "",
       height: "",
       bp: "",
@@ -149,10 +59,8 @@ const AddPatient = () => {
     },
     
     // Illness Syndromes
-    acuteIllness: false,
-    acuteIllnessDetails: "",
-    chronicIllness: false,
-    chronicIllnessDetails: "",
+    acuteIllness: {},
+    chronicIllness: {},
     
     // Systems Review
     systemsReview: {
@@ -196,14 +104,12 @@ const AddPatient = () => {
     histopathologicalDiagnosis: "",
     workingDiagnosis: "",
     finalDiagnosis: [],
-    reviewOfFinalDiagnosis: [],
+    reviewFinalDiagnosis: [],
     
     // Treatment
     treatmentPrescribed: "",
     treatmentRecords: []
   });
-
-  const { toast } = useToast();
 
   const handleInputChange = (field: string, value: any) => {
     setPatientData(prev => ({
@@ -212,17 +118,14 @@ const AddPatient = () => {
     }));
   };
 
-  const handleNestedChange = (parent: string, field: string, value: any) => {
-    setPatientData(prev => {
-      const parentObject = prev[parent as keyof typeof prev] as any;
-      return {
-        ...prev,
-        [parent]: {
-          ...parentObject,
-          [field]: value
-        }
-      };
-    });
+  const handleNestedChange = (section: string, field: string, value: any) => {
+    setPatientData(prev => ({
+      ...prev,
+      [section]: {
+        ...(prev[section as keyof typeof prev] as any),
+        [field]: value
+      }
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -259,581 +162,63 @@ const AddPatient = () => {
             onChange={handleInputChange} 
           />
 
-          {/* Complaints & Duration */}
+          {/* Complaints */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-primary">Complaints & Duration</CardTitle>
+              <CardTitle className="text-primary">Complaints</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <div>
                 <Label htmlFor="complaints">Complaints</Label>
                 <Textarea
                   id="complaints"
                   value={patientData.complaints}
                   onChange={(e) => handleInputChange("complaints", e.target.value)}
-                  rows={3}
+                  rows={4}
+                  placeholder="Patient's main complaints..."
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Duration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Duration</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div>
                 <Label htmlFor="duration">Duration</Label>
                 <Input
                   id="duration"
                   value={patientData.duration}
                   onChange={(e) => handleInputChange("duration", e.target.value)}
-                  placeholder="e.g., 2 weeks, 3 months"
+                  placeholder="Duration of symptoms (e.g., 2 weeks, 3 months)"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">History</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="historyDetails">History Details</Label>
-                <Textarea
-                  id="historyDetails"
-                  value={patientData.historyDetails}
-                  onChange={(e) => handleInputChange("historyDetails", e.target.value)}
-                  rows={3}
-                />
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isItchy"
-                  checked={patientData.isItchy}
-                  onCheckedChange={(checked) => handleInputChange("isItchy", checked)}
-                />
-                <Label htmlFor="isItchy">Itchy</Label>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="whereStarted">Where did it start?</Label>
-                  <Input
-                    id="whereStarted"
-                    value={patientData.whereStarted}
-                    onChange={(e) => handleInputChange("whereStarted", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="howSpread">How has it spread?</Label>
-                  <Textarea
-                    id="howSpread"
-                    value={patientData.howSpread}
-                    onChange={(e) => handleInputChange("howSpread", e.target.value)}
-                    rows={2}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <Label htmlFor="evolutionLesions">Evolution of the basic lesions?</Label>
-                  <Textarea
-                    id="evolutionLesions"
-                    value={patientData.evolutionLesions}
-                    onChange={(e) => handleInputChange("evolutionLesions", e.target.value)}
-                    rows={2}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="anatomicalSpread">Order of anatomical spread?</Label>
-                  <Textarea
-                    id="anatomicalSpread"
-                    value={patientData.anatomicalSpread}
-                    onChange={(e) => handleInputChange("anatomicalSpread", e.target.value)}
-                    rows={2}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Treatment Taken */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Treatment Taken</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries({
-                  gp: "GP",
-                  derm: "Dermatologist",
-                  ayurveda: "Ayurveda",
-                  unani: "Unani",
-                  homeo: "Homeopathy",
-                  sidha: "Sidha",
-                  herbal: "Herbal",
-                  naturopathy: "Naturopathy",
-                  beautician: "Beautician",
-                  self: "Self Medication",
-                  others: "Others"
-                }).map(([key, label]) => (
-                  <div key={key} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={key}
-                      checked={!!(patientData.treatments[key as keyof typeof patientData.treatments])}
-                      onCheckedChange={(checked) => 
-                        handleNestedChange("treatments", key, !!checked)
-                      }
-                    />
-                    <Label htmlFor={key} className="text-sm">{label}</Label>
-                  </div>
-                ))}
-              </div>
-              
-              {patientData.treatments.others && (
-                <div className="mt-4">
-                  <Label htmlFor="othersDetails">Other Treatment Details</Label>
-                  <Input
-                    id="othersDetails"
-                    value={patientData.treatments.othersDetails}
-                    onChange={(e) => handleNestedChange("treatments", "othersDetails", e.target.value)}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Investigations */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Investigations Undergone So Far</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {Object.entries({
-                  dna: "DNA - Details not available",
-                  nad: "NAD - Nothing abnormal detected",
-                  na: "NA - Not applicable", 
-                  nr: "NR - Not relevant",
-                  no: "NO - Not done",
-                  sbpr: "SBPR - Suggested but patient refused",
-                  sats: "SATS - Same as treatment suggested"
-                }).map(([key, label]) => (
-                  <div key={key} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={key}
-                      checked={!!patientData.investigations[key as keyof typeof patientData.investigations]}
-                      onCheckedChange={(checked) => 
-                        handleNestedChange("investigations", key, !!checked)
-                      }
-                    />
-                    <Label htmlFor={key} className="text-sm">{label}</Label>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <Label htmlFor="investigationDetails">Investigation Details</Label>
-                <Textarea
-                  id="investigationDetails"
-                  value={patientData.investigations.investigationDetails}
-                  onChange={(e) => handleNestedChange("investigations", "investigationDetails", e.target.value)}
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Medical History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Medical History</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="provocativeFactors">Provocative factors</Label>
-                <Textarea
-                  id="provocativeFactors"
-                  value={patientData.provocativeFactors}
-                  onChange={(e) => handleInputChange("provocativeFactors", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div>
-                <Label htmlFor="relievingFactors">Relieving factors</Label>
-                <Textarea
-                  id="relievingFactors"
-                  value={patientData.relievingFactors}
-                  onChange={(e) => handleInputChange("relievingFactors", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div>
-                <Label htmlFor="medicalIllnesses">Medical illnesses</Label>
-                <Textarea
-                  id="medicalIllnesses"
-                  value={patientData.medicalIllnesses}
-                  onChange={(e) => handleInputChange("medicalIllnesses", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div>
-                <Label htmlFor="surgicalIllnesses">Surgical illnesses, injuries, accident</Label>
-                <Textarea
-                  id="surgicalIllnesses"
-                  value={patientData.surgicalIllnesses}
-                  onChange={(e) => handleInputChange("surgicalIllnesses", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="vaccines"
-                    checked={!!patientData.vaccines}
-                    onCheckedChange={(checked) => handleInputChange("vaccines", !!checked)}
-                  />
-                  <Label htmlFor="vaccines">Vaccines, hyposensitisation</Label>
-                </div>
-                {patientData.vaccines && (
-                  <Textarea
-                    value={patientData.vaccineDetails}
-                    onChange={(e) => handleInputChange("vaccineDetails", e.target.value)}
-                    placeholder="Vaccine details..."
-                    rows={2}
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Allergies */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">History of Allergies</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {["drug", "food", "others"].map((allergyType) => (
-                <div key={allergyType} className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`allergy${allergyType}`}
-                      checked={!!patientData.allergies[allergyType as keyof typeof patientData.allergies]}
-                      onCheckedChange={(checked) => 
-                        handleNestedChange("allergies", allergyType, !!checked)
-                      }
-                    />
-                    <Label htmlFor={`allergy${allergyType}`} className="capitalize">{allergyType} Allergy</Label>
-                  </div>
-                  {patientData.allergies[allergyType as keyof typeof patientData.allergies] && (
-                    <Textarea
-                      value={patientData.allergies[`${allergyType}Details` as keyof typeof patientData.allergies] as string}
-                      onChange={(e) => handleNestedChange("allergies", `${allergyType}Details`, e.target.value)}
-                      placeholder={`${allergyType} allergy details...`}
-                      rows={2}
-                    />
-                  )}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Atopy History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">History of Atopy</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="wheezing"
-                    checked={patientData.atopy.wheezing}
-                    onCheckedChange={(checked) => handleNestedChange("atopy", "wheezing", checked)}
-                  />
-                  <Label htmlFor="wheezing">Wheezing illness</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="sneezing"
-                    checked={patientData.atopy.sneezing}
-                    onCheckedChange={(checked) => handleNestedChange("atopy", "sneezing", checked)}
-                  />
-                  <Label htmlFor="sneezing">Sneezing illness</Label>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Medications */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Medications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="currentMedication">Current medication (for skin disease)</Label>
-                <Textarea
-                  id="currentMedication"
-                  value={patientData.currentMedication}
-                  onChange={(e) => handleInputChange("currentMedication", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="concomitantMedication"
-                    checked={!!patientData.concomitantMedication}
-                    onCheckedChange={(checked) => handleInputChange("concomitantMedication", !!checked)}
-                  />
-                  <Label htmlFor="concomitantMedication">Concomitant medication (for other disease)</Label>
-                </div>
-                {patientData.concomitantMedication && (
-                  <Textarea
-                    value={patientData.concomitantDetails}
-                    onChange={(e) => handleInputChange("concomitantDetails", e.target.value)}
-                    placeholder="Concomitant medication details..."
-                    rows={2}
-                  />
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label className="font-medium">Long term medication</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {Object.entries({
-                    hp: "HP",
-                    dm: "DM", 
-                    pt: "PT",
-                    ep: "EP"
-                  }).map(([key, label]) => (
-                    <div key={key} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`longTerm${key}`}
-                        checked={!!patientData.longTermMedication[key as keyof typeof patientData.longTermMedication]}
-                        onCheckedChange={(checked) => 
-                          handleNestedChange("longTermMedication", key, !!checked)
-                        }
-                      />
-                      <Label htmlFor={`longTerm${key}`}>{label}</Label>
-                    </div>
-                  ))}
-                </div>
-                <Textarea
-                  value={patientData.longTermMedication.details}
-                  onChange={(e) => handleNestedChange("longTermMedication", "details", e.target.value)}
-                  placeholder="Long term medication details..."
-                  rows={2}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <HistorySection 
+            data={patientData} 
+            onChange={handleInputChange}
+            onNestedChange={handleNestedChange}
+          />
 
           {/* Family History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Family History</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="familySkinDisease"
-                    checked={patientData.familyHistory.skinDisease}
-                    onCheckedChange={(checked) => handleNestedChange("familyHistory", "skinDisease", checked)}
-                  />
-                  <Label htmlFor="familySkinDisease">Skin disease</Label>
-                </div>
-                {patientData.familyHistory.skinDisease && (
-                  <Textarea
-                    value={patientData.familyHistory.skinDiseaseDetails}
-                    onChange={(e) => handleNestedChange("familyHistory", "skinDiseaseDetails", e.target.value)}
-                    placeholder="Skin disease details..."
-                    rows={2}
-                  />
-                )}
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="familySimilarDisease"
-                    checked={patientData.familyHistory.similarDisease}
-                    onCheckedChange={(checked) => handleNestedChange("familyHistory", "similarDisease", checked)}
-                  />
-                  <Label htmlFor="familySimilarDisease">Similar disease</Label>
-                </div>
-                {patientData.familyHistory.similarDisease && (
-                  <Textarea
-                    value={patientData.familyHistory.similarDiseaseDetails}
-                    onChange={(e) => handleNestedChange("familyHistory", "similarDiseaseDetails", e.target.value)}
-                    placeholder="Similar disease details..."
-                    rows={2}
-                  />
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="familyDiabetes"
-                  checked={patientData.familyHistory.diabetes}
-                  onCheckedChange={(checked) => handleNestedChange("familyHistory", "diabetes", checked)}
-                />
-                <Label htmlFor="familyDiabetes">Diabetes</Label>
-              </div>
-            </CardContent>
-          </Card>
+          <FamilyHistorySection 
+            data={patientData} 
+            onChange={handleInputChange}
+            onNestedChange={handleNestedChange}
+          />
 
           {/* Social History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Social History</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="occupation">Occupation</Label>
-                  <Input
-                    id="occupation"
-                    value={patientData.socialHistory.occupation}
-                    onChange={(e) => handleNestedChange("socialHistory", "occupation", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="hobbies">Hobbies</Label>
-                  <Input
-                    id="hobbies"
-                    value={patientData.socialHistory.hobbies}
-                    onChange={(e) => handleNestedChange("socialHistory", "hobbies", e.target.value)}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="exposure">Exposure / Physical contactants</Label>
-                <Textarea
-                  id="exposure"
-                  value={patientData.socialHistory.exposure}
-                  onChange={(e) => handleNestedChange("socialHistory", "exposure", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="riskSTD"
-                    checked={patientData.socialHistory.riskSTD}
-                    onCheckedChange={(checked) => handleNestedChange("socialHistory", "riskSTD", checked)}
-                  />
-                  <Label htmlFor="riskSTD">Risk of STD</Label>
-                </div>
-                {patientData.socialHistory.riskSTD && (
-                  <Textarea
-                    value={patientData.socialHistory.riskSTDDetails}
-                    onChange={(e) => handleNestedChange("socialHistory", "riskSTDDetails", e.target.value)}
-                    placeholder="STD risk details..."
-                    rows={2}
-                  />
-                )}
-              </div>
-              <div>
-                <Label htmlFor="travel">Travel</Label>
-                <Textarea
-                  id="travel"
-                  value={patientData.socialHistory.travel}
-                  onChange={(e) => handleNestedChange("socialHistory", "travel", e.target.value)}
-                  rows={2}
-                />
-              </div>
-              <div>
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  value={patientData.socialHistory.address}
-                  onChange={(e) => handleNestedChange("socialHistory", "address", e.target.value)}
-                  rows={2}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Women-specific History */}
-          {patientData.sex === "F" && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-primary">Women-specific History</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="maritalStatus">Marital Status</Label>
-                  <Select onValueChange={(value) => handleNestedChange("womenHistory", "maritalStatus", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select marital status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Single">Single</SelectItem>
-                      <SelectItem value="Married">Married</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="pregnant"
-                      checked={patientData.womenHistory.pregnant}
-                      onCheckedChange={(checked) => handleNestedChange("womenHistory", "pregnant", checked)}
-                    />
-                    <Label htmlFor="pregnant">Pregnant</Label>
-                  </div>
-                  {patientData.womenHistory.pregnant && (
-                    <Input
-                      value={patientData.womenHistory.pregnantDetails}
-                      onChange={(e) => handleNestedChange("womenHistory", "pregnantDetails", e.target.value)}
-                      placeholder="Pregnancy details..."
-                    />
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="breastfeeding"
-                      checked={patientData.womenHistory.breastfeeding}
-                      onCheckedChange={(checked) => handleNestedChange("womenHistory", "breastfeeding", checked)}
-                    />
-                    <Label htmlFor="breastfeeding">Breast feeding</Label>
-                  </div>
-                  {patientData.womenHistory.breastfeeding && (
-                    <Input
-                      value={patientData.womenHistory.breastfeedingDetails}
-                      onChange={(e) => handleNestedChange("womenHistory", "breastfeedingDetails", e.target.value)}
-                      placeholder="Breastfeeding details..."
-                    />
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="childrenMale">Children - Male</Label>
-                    <Input
-                      id="childrenMale"
-                      type="number"
-                      value={patientData.womenHistory.childrenMale}
-                      onChange={(e) => handleNestedChange("womenHistory", "childrenMale", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="childrenFemale">Children - Female</Label> 
-                    <Input
-                      id="childrenFemale"
-                      type="number"
-                      value={patientData.womenHistory.childrenFemale}
-                      onChange={(e) => handleNestedChange("womenHistory", "childrenFemale", e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="menstruating"
-                    checked={patientData.womenHistory.menstruating}
-                    onCheckedChange={(checked) => handleNestedChange("womenHistory", "menstruating", checked)}
-                  />
-                  <Label htmlFor="menstruating">Menstruating</Label>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <SocialHistorySection 
+            data={patientData} 
+            onChange={handleInputChange}
+            onNestedChange={handleNestedChange}
+          />
 
           {/* General Physical Examination */}
           <Card>
@@ -841,7 +226,7 @@ const AddPatient = () => {
               <CardTitle className="text-primary">General Physical Examination (GPE)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <Label htmlFor="temperature">Temperature (°C)</Label>
                   <Input
@@ -862,20 +247,21 @@ const AddPatient = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bodySurfaceArea">Body Surface Area</Label>
-                  <Input
-                    id="bodySurfaceArea"
-                    value={patientData.gpe.bodySurfaceArea}
-                    onChange={(e) => handleNestedChange("gpe", "bodySurfaceArea", e.target.value)}
-                  />
-                </div>
-                <div>
                   <Label htmlFor="pulse">Pulse</Label>
                   <Input
                     id="pulse"
                     type="number"
                     value={patientData.gpe.pulse}
                     onChange={(e) => handleNestedChange("gpe", "pulse", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bp">Blood Pressure</Label>
+                  <Input
+                    id="bp"
+                    value={patientData.gpe.bp}
+                    onChange={(e) => handleNestedChange("gpe", "bp", e.target.value)}
+                    placeholder="120/80"
                   />
                 </div>
                 <div>
@@ -888,15 +274,6 @@ const AddPatient = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bp">Blood Pressure</Label>
-                  <Input
-                    id="bp"
-                    value={patientData.gpe.bp}
-                    onChange={(e) => handleNestedChange("gpe", "bp", e.target.value)}
-                    placeholder="e.g., 120/80"
-                  />
-                </div>
-                <div>
                   <Label htmlFor="weight">Weight (kg)</Label>
                   <Input
                     id="weight"
@@ -906,90 +283,64 @@ const AddPatient = () => {
                     onChange={(e) => handleNestedChange("gpe", "weight", e.target.value)}
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="lymphNodes"
-                    checked={patientData.gpe.lymphNodes}
-                    onCheckedChange={(checked) => handleNestedChange("gpe", "lymphNodes", checked)}
+                <div>
+                  <Label htmlFor="bodyArea">Body Surface Area</Label>
+                  <Input
+                    id="bodyArea"
+                    value={patientData.gpe.bodyArea}
+                    onChange={(e) => handleNestedChange("gpe", "bodyArea", e.target.value)}
                   />
-                  <Label htmlFor="lymphNodes">Lymph Nodes</Label>
                 </div>
-                {patientData.gpe.lymphNodes && (
-                  <Textarea
-                    value={patientData.gpe.lymphNodesDetails}
-                    onChange={(e) => handleNestedChange("gpe", "lymphNodesDetails", e.target.value)}
-                    placeholder="Lymph nodes details..."
-                    rows={2}
-                  />
-                )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hepatomegaly"
-                    checked={patientData.gpe.hepatomegaly}
-                    onCheckedChange={(checked) => handleNestedChange("gpe", "hepatomegaly", checked)}
-                  />
-                  <Label htmlFor="hepatomegaly">Hepatomegaly</Label>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="lymphNodes"
+                      checked={!!patientData.gpe.lymphNodes}
+                      onCheckedChange={(checked) => handleNestedChange("gpe", "lymphNodes", checked)}
+                    />
+                    <Label htmlFor="lymphNodes">Lymph Nodes</Label>
+                  </div>
+                  {patientData.gpe.lymphNodes && (
+                    <Textarea
+                      value={patientData.gpe.lymphNodesDetails}
+                      onChange={(e) => handleNestedChange("gpe", "lymphNodesDetails", e.target.value)}
+                      placeholder="Lymph nodes details..."
+                      rows={2}
+                    />
+                  )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="splenomegaly"
-                    checked={patientData.gpe.splenomegaly}
-                    onCheckedChange={(checked) => handleNestedChange("gpe", "splenomegaly", checked)}
-                  />
-                  <Label htmlFor="splenomegaly">Splenomegaly</Label>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hepatomegaly"
+                      checked={!!patientData.gpe.hepatomegaly}
+                      onCheckedChange={(checked) => handleNestedChange("gpe", "hepatomegaly", checked)}
+                    />
+                    <Label htmlFor="hepatomegaly">Hepatomegaly</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="splenomegaly"
+                      checked={!!patientData.gpe.splenomegaly}
+                      onCheckedChange={(checked) => handleNestedChange("gpe", "splenomegaly", checked)}
+                    />
+                    <Label htmlFor="splenomegaly">Splenomegaly</Label>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Illness Syndromes */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Illness Syndromes</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="acuteIllness"
-                    checked={patientData.acuteIllness}
-                    onCheckedChange={(checked) => handleInputChange("acuteIllness", checked)}
-                  />
-                  <Label htmlFor="acuteIllness">Acute illness syndrome</Label>
-                </div>
-                {patientData.acuteIllness && (
-                  <Textarea
-                    value={patientData.acuteIllnessDetails}
-                    onChange={(e) => handleInputChange("acuteIllnessDetails", e.target.value)}
-                    placeholder="Fever, chills, headache, sweat, vomiting etc..."
-                    rows={2}
-                  />
-                )}
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="chronicIllness"
-                    checked={patientData.chronicIllness}
-                    onCheckedChange={(checked) => handleInputChange("chronicIllness", checked)}
-                  />
-                  <Label htmlFor="chronicIllness">Chronic illness syndrome</Label>
-                </div>
-                {patientData.chronicIllness && (
-                  <Textarea
-                    value={patientData.chronicIllnessDetails}
-                    onChange={(e) => handleInputChange("chronicIllnessDetails", e.target.value)}
-                    placeholder="Fatigue, anorexia, weight loss, malaise..."
-                    rows={2}
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Acute & Chronic Illness Syndrome */}
+          <IllnessSyndromeSection 
+            data={patientData} 
+            onChange={handleInputChange}
+            onNestedChange={handleNestedChange}
+          />
 
           {/* Systems Review */}
           <Card>
@@ -1007,7 +358,7 @@ const AddPatient = () => {
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id={key}
-                      checked={patientData.systemsReview[key as keyof typeof patientData.systemsReview]}
+                      checked={!!patientData.systemsReview[key as keyof typeof patientData.systemsReview]}
                       onCheckedChange={(checked) => handleNestedChange("systemsReview", key, checked)}
                     />
                     <Label htmlFor={key}>{label}</Label>
@@ -1057,7 +408,7 @@ const AddPatient = () => {
                   <div key={key} className="flex items-center space-x-2">
                     <Checkbox
                       id={key}
-                      checked={patientData.specialProcedures[key as keyof typeof patientData.specialProcedures]}
+                      checked={!!patientData.specialProcedures[key as keyof typeof patientData.specialProcedures]}
                       onCheckedChange={(checked) => 
                         handleNestedChange("specialProcedures", key, checked)
                       }
@@ -1073,6 +424,7 @@ const AddPatient = () => {
                   value={patientData.specialProcedures.procedureNotes}
                   onChange={(e) => handleNestedChange("specialProcedures", "procedureNotes", e.target.value)}
                   rows={3}
+                  placeholder="Additional procedure notes..."
                 />
               </div>
             </CardContent>
@@ -1084,30 +436,55 @@ const AddPatient = () => {
               <CardTitle className="text-primary">Clinical Photographs</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center p-8 border-2 border-dashed rounded-lg">
-                <p className="text-muted-foreground">
-                  Photo upload functionality will be available once Supabase is connected for file storage.
-                </p>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">Upload clinical photographs with dates and captions</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((num) => (
+                    <div key={num} className="border rounded-lg p-4 space-y-2">
+                      <Label className="font-medium">Photo {num}</Label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                      />
+                      <Input
+                        type="date"
+                        placeholder="Photo date"
+                      />
+                      <Input
+                        placeholder="Caption"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Diagnoses */}
+          {/* Diagnosis */}
           <DiagnosisSection 
-            data={patientData}
+            data={patientData} 
             onChange={handleInputChange}
           />
 
           {/* Treatment */}
           <TreatmentSection 
-            data={patientData}
+            data={patientData} 
             onChange={handleInputChange}
           />
 
-          <div className="flex justify-between">
-            <Button type="button" variant="outline">Save Draft</Button>
-            <Button type="submit" className="bg-primary hover:bg-primary/90">
-              Save Patient Record
+          {/* Submit Button */}
+          <div className="flex gap-4">
+            <Button type="submit" size="lg" className="flex-1">
+              Save Patient Data
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="lg"
+              onClick={() => navigate("/")}
+            >
+              Cancel
             </Button>
           </div>
         </form>
