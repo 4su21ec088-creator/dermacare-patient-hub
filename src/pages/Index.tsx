@@ -5,16 +5,10 @@ import { UserPlus, Search, BarChart3, Users, Calendar, Stethoscope, FileText } f
 
 const Index = () => {
   const quickStats = [
-    { label: "Total Patients", value: "163", icon: Users, color: "text-primary" },
-    { label: "This Month", value: "67", icon: Calendar, color: "text-success" },
-    { label: "Pending Reviews", value: "12", icon: FileText, color: "text-orange-500" },
-    { label: "Active Cases", value: "45", icon: Stethoscope, color: "text-blue-500" }
-  ];
-
-  const recentPatients = [
-    { name: "Sarah Johnson", phone: "9876543210", diagnosis: "Eczema", date: "2024-01-20" },
-    { name: "Michael Chen", phone: "9876543211", diagnosis: "Psoriasis", date: "2024-01-19" },
-    { name: "Emily Davis", phone: "9876543212", diagnosis: "Contact Dermatitis", date: "2024-01-18" }
+    { label: "Total Patients", value: "0", icon: Users, color: "text-primary" },
+    { label: "This Month", value: "0", icon: Calendar, color: "text-success" },
+    { label: "Pending Reviews", value: "0", icon: FileText, color: "text-orange-500" },
+    { label: "Active Cases", value: "0", icon: Stethoscope, color: "text-blue-500" }
   ];
 
   return (
@@ -98,55 +92,21 @@ const Index = () => {
           })}
         </div>
 
-        {/* Recent Patients */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-primary">Recent Patients</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentPatients.map((patient, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border border-medical-border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Users className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{patient.name}</p>
-                      <p className="text-sm text-muted-foreground">{patient.phone}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-primary">{patient.diagnosis}</p>
-                    <p className="text-sm text-muted-foreground">{patient.date}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-4 text-center">
-              <Button asChild variant="outline">
-                <Link to="/search">View All Patients</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Database Integration Notice */}
-        <Card className="mt-8 border-medical-border bg-medical-light/50">
+        {/* System Ready Notice */}
+        <Card className="border-medical-border bg-medical-light/50">
           <CardContent className="pt-6">
             <div className="text-center">
               <Stethoscope className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-primary mb-2">
-                Ready for Database Integration
+                System Ready for Patient Registration
               </h3>
               <p className="text-muted-foreground mb-4">
-                This system is designed to work with Supabase for secure patient data storage, 
-                search functionality, and comprehensive analytics.
+                Start adding patient records using the comprehensive dermatology case file form. 
+                All data will be stored securely once database integration is enabled.
               </p>
-              <p className="text-sm text-muted-foreground">
-                Currently running in demo mode with sample data.
-              </p>
+              <Button asChild className="bg-primary hover:bg-primary/90">
+                <Link to="/add-patient">Add Your First Patient</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

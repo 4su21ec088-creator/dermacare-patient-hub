@@ -13,21 +13,6 @@ const SearchPatient = () => {
 
   const { toast } = useToast();
 
-  // Mock patient data for demonstration
-  const mockPatientData = {
-    name: "John Doe",
-    age: "35",
-    gender: "M",
-    phone: "1234567890",
-    fileNo: "PT001",
-    date: "2024-01-15",
-    complaints: "Rash on arms and legs, itching for 2 weeks",
-    duration: "2 weeks",
-    provisionalDiagnosis: "Contact dermatitis",
-    finalDiagnosis: "Allergic contact dermatitis",
-    treatmentPrescribed: "Topical corticosteroids, antihistamines"
-  };
-
   const handleSearch = async () => {
     if (!searchPhone.trim()) {
       toast({
@@ -40,24 +25,16 @@ const SearchPatient = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
+    // TODO: Connect to database to search for patient records
     setTimeout(() => {
-      if (searchPhone === "1234567890") {
-        setSearchResults(mockPatientData);
-        toast({
-          title: "Patient Found",
-          description: "Patient record retrieved successfully",
-        });
-      } else {
-        setSearchResults(null);
-        toast({
-          title: "No Results",
-          description: "No patient found with this phone number",
-          variant: "destructive"
-        });
-      }
+      setSearchResults(null);
+      toast({
+        title: "No Patients Yet",
+        description: "No patient records found. Start by adding your first patient.",
+        variant: "destructive"
+      });
       setIsLoading(false);
-    }, 1000);
+    }, 500);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -194,14 +171,12 @@ const SearchPatient = () => {
           </div>
         )}
 
-        {/* Demo Notice */}
-        <Card className="mt-6 border-medical-border">
+        {/* Ready Notice */}
+        <Card className="mt-6 border-medical-border bg-medical-light/50">
           <CardContent className="pt-6">
             <div className="text-center text-muted-foreground">
               <p className="text-sm">
-                <strong>Demo Mode:</strong> Try searching with phone number "1234567890" to see sample data.
-                <br />
-                Connect to Supabase to enable real database functionality.
+                <strong>Note:</strong> Patient search will be available once you add patient records and enable database integration.
               </p>
             </div>
           </CardContent>
