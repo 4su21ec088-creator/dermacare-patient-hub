@@ -75,7 +75,6 @@ const SearchPatient = () => {
               <Button 
                 onClick={handleSearch}
                 disabled={isLoading}
-                className="bg-primary hover:bg-primary/90"
               >
                 {isLoading ? "Searching..." : "Search"}
               </Button>
