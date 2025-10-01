@@ -17,36 +17,14 @@ const Analytics = () => {
     location: ""
   });
 
-  // Mock analytics data
-  const diagnosisData = [
-    { name: "Contact Dermatitis", count: 45, percentage: 35 },
-    { name: "Eczema", count: 32, percentage: 25 },
-    { name: "Psoriasis", count: 20, percentage: 15 },
-    { name: "Acne", count: 18, percentage: 14 },
-    { name: "Fungal Infections", count: 14, percentage: 11 }
-  ];
+  // Analytics data - will populate once patients are added
+  const diagnosisData: Array<{ name: string; count: number; percentage: number }> = [];
 
-  const ageDistribution = [
-    { ageGroup: "0-18", male: 12, female: 15 },
-    { ageGroup: "19-35", male: 25, female: 28 },
-    { ageGroup: "36-50", male: 20, female: 18 },
-    { ageGroup: "51-65", male: 15, female: 12 },
-    { ageGroup: "65+", male: 8, female: 10 }
-  ];
+  const ageDistribution: Array<{ ageGroup: string; male: number; female: number }> = [];
 
-  const genderData = [
-    { name: "Female", value: 83, color: "#EC4899" },
-    { name: "Male", value: 80, color: "#3B82F6" }
-  ];
+  const genderData: Array<{ name: string; value: number; color: string }> = [];
 
-  const monthlyTrends = [
-    { month: "Jan", patients: 45 },
-    { month: "Feb", patients: 52 },
-    { month: "Mar", patients: 48 },
-    { month: "Apr", patients: 61 },
-    { month: "May", patients: 55 },
-    { month: "Jun", patients: 67 }
-  ];
+  const monthlyTrends: Array<{ month: string; patients: number }> = [];
 
   const handleFilterChange = (field: string, value: string) => {
     setFilters(prev => ({
@@ -171,7 +149,7 @@ const Analytics = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-primary">163</p>
+                  <p className="text-2xl font-bold text-primary">0</p>
                   <p className="text-sm text-muted-foreground">Total Patients</p>
                 </div>
                 <Users className="h-8 w-8 text-primary" />
@@ -183,7 +161,7 @@ const Analytics = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-primary">67</p>
+                  <p className="text-2xl font-bold text-primary">0</p>
                   <p className="text-sm text-muted-foreground">This Month</p>
                 </div>
                 <Calendar className="h-8 w-8 text-primary" />
@@ -195,7 +173,7 @@ const Analytics = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-primary">51%</p>
+                  <p className="text-2xl font-bold text-primary">-</p>
                   <p className="text-sm text-muted-foreground">Female Patients</p>
                 </div>
                 <User className="h-8 w-8 text-primary" />
@@ -207,7 +185,7 @@ const Analytics = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-primary">15</p>
+                  <p className="text-2xl font-bold text-primary">-</p>
                   <p className="text-sm text-muted-foreground">Avg Age Range</p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-primary" />
@@ -224,21 +202,27 @@ const Analytics = () => {
               <CardTitle className="text-primary">Top Diagnoses</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={diagnosisData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                    fontSize={12}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
+              {diagnosisData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={diagnosisData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      fontSize={12}
+                    />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <p>No diagnosis data available yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -248,25 +232,31 @@ const Analytics = () => {
               <CardTitle className="text-primary">Gender Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={genderData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {genderData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              {genderData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={genderData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {genderData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <p>No gender data available yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -279,16 +269,22 @@ const Analytics = () => {
               <CardTitle className="text-primary">Age Distribution by Gender</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={ageDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="ageGroup" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="male" fill="#3B82F6" name="Male" />
-                  <Bar dataKey="female" fill="#EC4899" name="Female" />
-                </BarChart>
-              </ResponsiveContainer>
+              {ageDistribution.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={ageDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="ageGroup" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="male" fill="#3B82F6" name="Male" />
+                    <Bar dataKey="female" fill="#EC4899" name="Female" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <p>No age distribution data available yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -298,31 +294,41 @@ const Analytics = () => {
               <CardTitle className="text-primary">Monthly Patient Trends</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={monthlyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="patients" fill="hsl(var(--success))" />
-                </BarChart>
-              </ResponsiveContainer>
+              {monthlyTrends.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={monthlyTrends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="patients" fill="hsl(var(--success))" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <p>No monthly trend data available yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Sample Query Result */}
-        <Card className="mt-6">
+        {/* Analytics Ready Notice */}
+        <Card className="mt-6 border-medical-border bg-medical-light/50">
           <CardHeader>
-            <CardTitle className="text-primary">Sample Query Result</CardTitle>
+            <CardTitle className="text-primary">Analytics Dashboard Ready</CardTitle>
           </CardHeader>
           <CardContent>
-                <div className="bg-muted p-4 rounded-lg">
-              <p className="text-sm font-medium mb-2">Query: &quot;How many females from Bangalore who are homemakers have contact dermatitis?&quot;</p>
-              <p className="text-2xl font-bold text-primary">12 patients</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Representing 18% of contact dermatitis cases and 7% of total female patients
+            <div className="bg-muted p-4 rounded-lg">
+              <p className="text-sm font-medium mb-2">
+                Once you add patient records, this dashboard will display comprehensive analytics including:
               </p>
+              <ul className="text-sm text-muted-foreground mt-2 space-y-1 list-disc list-inside">
+                <li>Diagnosis distribution and trends</li>
+                <li>Gender and age demographics</li>
+                <li>Monthly patient flow</li>
+                <li>Custom filtered queries (e.g., "How many females from Bangalore who are homemakers have contact dermatitis?")</li>
+              </ul>
             </div>
           </CardContent>
         </Card>
