@@ -63,10 +63,7 @@ const Analytics = () => {
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="contact-dermatitis">Contact Dermatitis</SelectItem>
-                    <SelectItem value="eczema">Eczema</SelectItem>
-                    <SelectItem value="psoriasis">Psoriasis</SelectItem>
-                    <SelectItem value="acne">Acne</SelectItem>
+                    <SelectItem value="none">No data available</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -78,9 +75,7 @@ const Analytics = () => {
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="acute">Acute (&lt; 1 week)</SelectItem>
-                    <SelectItem value="subacute">Subacute (1-4 weeks)</SelectItem>
-                    <SelectItem value="chronic">Chronic (&gt; 4 weeks)</SelectItem>
+                    <SelectItem value="none">No data available</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -92,11 +87,7 @@ const Analytics = () => {
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0-18">0-18 years</SelectItem>
-                    <SelectItem value="19-35">19-35 years</SelectItem>
-                    <SelectItem value="36-50">36-50 years</SelectItem>
-                    <SelectItem value="51-65">51-65 years</SelectItem>
-                    <SelectItem value="65+">65+ years</SelectItem>
+                    <SelectItem value="none">No data available</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -108,8 +99,7 @@ const Analytics = () => {
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="M">Male</SelectItem>
-                    <SelectItem value="F">Female</SelectItem>
+                    <SelectItem value="none">No data available</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
